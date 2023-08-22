@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stopwatch</title>
+    <link rel="stylesheet" href="./style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Handjet:wght@500&family=Libre+Baskerville&family=Rajdhani:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="card">
+        <div class="watch">
+            <div class="circle">
+                <div class="in_circle">
+                    <span class="text minutes">00 :</span>
+                    <span class="text seconds">00 :</span>
+                    <span class="text mseconds">00</span>
+                </div>
+            </div>
+            <div class="button_wrapper">
+                <button class="button reset hidden">Reset</button>
+                <button class="button play">Play</button>
+                <button class="button lap hidden">Lap</button>
+            </div>
+        </div>
+        <ul class="laps">
+            <button class="lap_clear_button">Clear All</button>
+        </ul>
+    </div>
+    <script>
+        const playbutton = document.querySelector(".play");
+        const lapbutton = document.querySelector(".lap");
+        const resetbutton = document.querySelector(".reset");
+        const minutes = document.querySelector(".minutes");
+        const seconds = document.querySelector(".seconds");
+        const centiseconds = document.querySelector(".mseconds");
+        const laps = document.querySelector(".laps");
+        const lapClearButton = document.querySelector(".lap_clear_button");
+        const bg = document.querySelector(".circle");
+        let isplay = false;
+        let minuteCounter = 0;
+        let secCounter = 0;
+        let centiCounter = 0;
+        let isreset = true;
+        let secInterval, centiInterval, minuteInterval;
+
+        const togglebutton = () => {
+            lapbutton.classList.toggle("hidden");
+            resetbutton.classList.toggle("hidden");
+        }
+
+        const play = () => {
+            if (!isplay && isreset) {
+                playbutton.innerHTML = 'Pause';
+                bg.classList.add("animation-bg");
+                secInterval = setInterval(() => {
+                    secCounter++;
+                    if (secCounter === 60) {
+                        secCounter = 0;
+                    }
+                    seconds.innerHTML = `${secCounter < 10 ? '0' : ''}${secCounter} : `;
+                }, 1000);
+                centiInterval = setInterval(() => {
+                    centiCounter++;
+                    if (centiCounter === 100) {
+                        centiCounter = 0;
+                    }
+                    centiseconds.innerHTML = `${centiCounter < 10 ? '0' : ''}${centiCounter}`;
+                }, 10);
+                minuteInterval = setInterval(() => {
+                    minuteCounter++;
+                    minutes.innerHTML = `${minuteCounter < 10 ? '0' : ''}${minuteCounter} : `;
+                }, 60000);
+                isplay = true;
+                isreset = false;
+            } else {
+                playbutton.innerHTML = 'Play';
+                clearInterval(minuteInterval);
+                clearInterval(secInterval);
+                clearInterval(centiInterval);
+                isplay = false;
+                isreset = true;
+                bg.classList.remove("animation-bg");
+            }
+            togglebutton();
+        }
+
+        const reset = () => {
+            playbutton.innerHTML = 'Play';
+            clearInterval(minuteInterval);
+            clearInterval(secInterval);
+            clearInterval(centiInterval);
+            isplay = false;
+            isreset = true;
+            bg.classList.remove("animation-bg");
+
+            seconds.innerHTML = '&nbsp;00 :';
+            centiseconds.innerHTML = '&nbsp;00';
+            minutes.innerHTML = '00 :';
+            minuteCounter = 0;
+            secCounter = 0;
+            centiCounter = 0;
+
+            togglebutton();
+        }
+
+        const lap = () => {
+            if (isplay) {
+                const li = document.createElement("li");
+                const number = document.createElement("span");
+                const timestamp = document.createElement("span");
+
+                li.setAttribute("class", "lap_item");
+                number.setAttribute("class", "number");
+                timestamp.setAttribute("class", "time_stamp");
+
+                timestamp.innerHTML = `${minuteCounter} : ${secCounter < 10 ? '0' : ''}${secCounter} : ${centiCounter < 10 ? '0' : ''}${centiCounter}`;
+
+                li.append(number, timestamp);
+                laps.appendChild(li);
+            }
+        }
+
+        const clearLaps = () => {
+            laps.innerHTML = '';
+        }
+
+        playbutton.addEventListener("click", play);
+        resetbutton.addEventListener("click", reset);
+        lapbutton.addEventListener("click", lap);
+        lapClearButton.addEventListener("click", clearLaps);
+    </script>
+</body>
+</html>
